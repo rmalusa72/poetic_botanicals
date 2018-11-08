@@ -4,6 +4,7 @@ Generative field guide with poetry for NaNoGenMo 2018
 TODO: 
 * Format output in multimarkdown
 * Convert multimarkdown into PDF
+* Resolve case where page is for a common name
 * Scrape illustrations & decide how to caption
 * Scrape actual facts
 * Collect more source text from wikipedia but also old public domain books etc
