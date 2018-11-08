@@ -1,10 +1,11 @@
 # poetic_botanicals
 Generative field guide with poetry for NaNoGenMo 2018
 
-
 TODO: 
-* Conquer relevant markdown/formatting
+* Format output in multimarkdown
+* Convert multimarkdown into PDF
 * Scrape illustrations & decide how to caption
 * Scrape actual facts
-* Construct heuristics for internal sound repetition, rhyme and meter
+* Collect more source text from wikipedia but also old public domain books etc
+* Use sound similarity vectors and pronouncingpy to increase sound repetition & enforce rhyme and meter
 * Use those + synonym replacement to stitch together fragments of source texts into ~poems
