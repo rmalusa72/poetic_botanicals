@@ -4,9 +4,11 @@
 import re
 import thesaurus
 import pronouncing 
+import psv
 
 STRESSED = True
 UNSTRESSED = False
+psvs = psv.PSV_Space()
 
 # Estimate the number of syllables in a word (poorly)
 def dirtysyllables(word):
@@ -45,8 +47,30 @@ def get_stresses_oneword(word):
         stresses = '3' * num_syllables
     return stresses
 
-# Attempt synonym replacement to construct metered (currently iambic) text
 def poetify(sentence):
+
+    poem = []
+    next_syllable = UNSTRESSED
+
+    for word in sentence.split(" "):
+        # Potential next words are stored in a dictionary with the format
+        # word:(stress pattern, phonetic vector, score)
+        potential_words = {word:(get_stresses(word), psvs.psvector(word), 0)}
+
+        # Get word's synonyms to add to potential words
+        w = thesaurus.Word(word)
+        synonyms = w.synonyms()
+        for synonym in synonyms:
+            potential_words[synonym] = (get_stresses(synonym), psvs.psvector(synonym), 0)
+
+        # Score potential words
+        
+
+        
+
+
+# Attempt synonym replacement to construct metered (currently iambic) text
+def poetify_1(sentence):
     
     poem = []
     next_syllable = UNSTRESSED
@@ -65,7 +89,7 @@ def poetify(sentence):
             desired_syl_pattern = r"[03]([123][03])*[123]*"
         print(desired_syl_pattern)
         print(re.match(desired_syl_pattern, stresses))
-        
+
         if re.match(desired_syl_pattern, stresses):
             poem.append(word)
             if len(stresses) % 2 != 0:
@@ -87,5 +111,3 @@ def poetify(sentence):
                 poem.append(word)
 
     return poem
-
-
