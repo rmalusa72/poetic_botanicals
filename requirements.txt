@@ -1,0 +1,4 @@
+thesaurus
+pronouncing
+numpy
+num2words

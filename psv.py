@@ -28,3 +28,12 @@ class PSV_Space():
             return self.space[word]
         else:
             return None
+
+    def get_phonetic_similarity(self, word1, word2):
+        v1 = self.psvector(word1)
+        v2 = self.psvector(word2)
+        if isinstance(v1, np.ndarray) and isinstance(v2, np.ndarray):
+            similarity = cosine(v1, v2)
+        else:
+            similarity = 0
+        return similarity

@@ -5,9 +5,13 @@ import re
 import thesaurus
 import pronouncing 
 import psv
+from num2words import num2words
 
 STRESSED = True
 UNSTRESSED = False
+PHONETIC_SIMILARITY_WEIGHT = 9
+METRIC_CONFORMITY_WEIGHT = 1
+
 psvs = psv.PSV_Space()
 
 # Estimate the number of syllables in a word (poorly)
@@ -25,8 +29,7 @@ def dirtysyllables(word):
 
     return syllables 
 
-# Use pronouncing to get stresses for a word
-# Or return string of as many 3s as there are syllables if word is not in pronouncing dict
+# Get stresses for each word in a phrase and concatenate them
 def get_stresses(phrase):
     words = phrase.split(" ")
     if len(words) == 1:
@@ -37,40 +40,126 @@ def get_stresses(phrase):
             stresses = stresses + get_stresses_oneword(word)
         return stresses
 
+# Use pronouncing to get stresses for a word
+# Or return string of as many 3s as there are syllables if word is not in pronouncing dict
 def get_stresses_oneword(word):
     phones_list = pronouncing.phones_for_word(word)
     if len(phones_list) > 0:
         phones = phones_list[0]
         stresses = pronouncing.stresses(phones)
+        if len(stresses) == 1:
+            stresses = "3"
     else:
         num_syllables = dirtysyllables(word)
         stresses = '3' * num_syllables
     return stresses
 
+
+def score_metric_conformity(meter, word):
+    position_in_meter = 0
+    stresses = get_stresses(word)
+
+    hits = 0
+    misses = 0
+
+    for stress in stresses:
+
+        if meter[position_in_meter] == "0":
+            options = "03"
+        elif meter[position_in_meter] == "1":
+            options = "123"
+
+        if stress in options:
+            hits = hits + 1
+            position_in_meter = position_in_meter + 1
+            if position_in_meter >= len(meter):
+                position_in_meter = 0
+        else:
+            misses = misses + 1
+
+    return (hits / (hits + misses))
+
+    
+# Gets cosine similarity of two vectors and converts to value between 0 and 1
+def score_phonetic_similarity(word1, word2):
+    return ((psvs.get_phonetic_similarity(word1,word2) + 1 )/ 2)
+
 def poetify(sentence):
 
     poem = []
     next_syllable = UNSTRESSED
+    pre_words = re.findall(r"([\d]+[,\d]+|\w+\'?\w*)", sentence)
+    words = []
 
-    for word in sentence.split(" "):
+    print(pre_words)
+
+    for word in pre_words:
+
+        print(word)
+
+        # Check if each word is a number
+        if not re.search(r"\d", word):
+            words.append(word)
+        else:
+            # If word contains digits, split into digit and non-digit pieces
+            word = re.sub(",", "", word)
+            split_by_numbers = re.split(r"(\d+)", word)
+            print(str(split_by_numbers))
+            for piece in split_by_numbers:
+                print(piece)
+                # Convert digits to strings and add non-digit strings
+                if re.fullmatch(r"\d+", piece):
+                    word_version = num2words(int(piece), lang="en")
+                    print(word_version)
+                    words = words + re.findall(r"\w+", word_version)
+                elif piece != "": 
+                    words.append(piece)
+
+    print(words)
+
+    for word in words:
+
         # Potential next words are stored in a dictionary with the format
-        # word:(stress pattern, phonetic vector, score)
-        potential_words = {word:(get_stresses(word), psvs.psvector(word), 0)}
+        # word: score
+        potential_words = {word:0}
 
         # Get word's synonyms to add to potential words
         w = thesaurus.Word(word)
         synonyms = w.synonyms()
         for synonym in synonyms:
-            potential_words[synonym] = (get_stresses(synonym), psvs.psvector(synonym), 0)
+            potential_words[synonym] =  0
 
         # Score potential words
-        
+        maxscore = 0
+        maxscoreword = word
 
-        
+        for nextword in potential_words.keys():
+            if len(poem) > 0: 
+                phonetic_similarity = score_phonetic_similarity(poem[-1], nextword)
+
+                if next_syllable == UNSTRESSED: 
+                    meter = "01"
+                else:
+                    meter = "10"
+                metric_conformity = score_metric_conformity(meter, nextword)
+
+                score = phonetic_similarity * PHONETIC_SIMILARITY_WEIGHT + metric_conformity * METRIC_CONFORMITY_WEIGHT
+                potential_words[nextword] = score
+
+                if score > maxscore:
+                    maxscore = score
+                    maxscoreword = nextword
+
+        poem.append(maxscoreword)
+        stresses = get_stresses(maxscoreword)
+        if len(stresses) % 2 == 1:
+            next_syllable = not next_syllable
+
+    return poem
 
 
 # Attempt synonym replacement to construct metered (currently iambic) text
-def poetify_1(sentence):
+def poetify_old(sentence):
     
     poem = []
     next_syllable = UNSTRESSED
