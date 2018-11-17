@@ -11,6 +11,7 @@ STRESSED = True
 UNSTRESSED = False
 PHONETIC_SIMILARITY_WEIGHT = 9
 METRIC_CONFORMITY_WEIGHT = 1
+LINE_LENGTH_SYLLABLES = 10
 
 psvs = psv.PSV_Space()
 
@@ -84,6 +85,7 @@ def score_metric_conformity(meter, word):
 def score_phonetic_similarity(word1, word2):
     return ((psvs.get_phonetic_similarity(word1,word2) + 1 )/ 2)
 
+# todo: change how meter works to go by whether last syllable is stressed or unstressed rather than num syllables?
 def poetify(sentence):
 
     poem = []
@@ -157,6 +159,20 @@ def poetify(sentence):
 
     return poem
 
+def poem_to_string(poem):
+    output = ""
+    running_syllable_count = 0
+    for item in poem:
+        words = item.split(" ")
+        for word in words:
+            stresses = get_stresses(word)
+            syllable_count = len(stresses)
+            output = output + word + " "
+            running_syllable_count += syllable_count
+            if running_syllable_count >= LINE_LENGTH_SYLLABLES:
+                running_syllable_count = 0
+                output = output + "\n"
+    return output
 
 # Attempt synonym replacement to construct metered (currently iambic) text
 def poetify_old(sentence):
