@@ -28,7 +28,10 @@ def dirtysyllables(word):
         else:
             invowelblock = False
 
-    return syllables 
+    if syllables != 0: 
+        return syllables
+    else:
+        return 1
 
 # Get stresses for each word in a phrase and concatenate them
 def get_stresses(phrase):
@@ -48,7 +51,7 @@ def get_stresses_oneword(word):
     if len(phones_list) > 0:
         phones = phones_list[0]
         stresses = pronouncing.stresses(phones)
-        if len(stresses) == 1:
+        if len(stresses) == 0 or len(stresses) == 1:
             stresses = "3"
     else:
         num_syllables = dirtysyllables(word)
@@ -78,6 +81,8 @@ def score_metric_conformity(meter, word):
         else:
             misses = misses + 1
 
+    if (hits + misses) == 0:
+        print("problem scoring conformity of " + word)
     return (hits / (hits + misses))
 
     
@@ -157,7 +162,7 @@ def poetify(sentence):
         if len(stresses) % 2 == 1:
             next_syllable = not next_syllable
 
-    return poem
+    return poem_to_string(poem)
 
 def poem_to_string(poem):
     output = ""
@@ -172,6 +177,7 @@ def poem_to_string(poem):
             if running_syllable_count >= LINE_LENGTH_SYLLABLES:
                 running_syllable_count = 0
                 output = output + "\n"
+    output = output + "\n"
     return output
 
 # Attempt synonym replacement to construct metered (currently iambic) text

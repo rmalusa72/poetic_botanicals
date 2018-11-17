@@ -3,9 +3,9 @@
 
 import re
 import pycorpora
-import wikipedia
+import scraper
+import synsound
 
-wikipedia.set_rate_limiting(True)
 plants = []
 for flower in pycorpora.plants.flowers['flowers']:
     plants.append(flower)
@@ -16,21 +16,24 @@ plants.sort()
 filename = "book/output.txt"
 f = open(filename, "w")
 
-for plant in plants:
-    f.write("# " + plant.title() + "\n")
+scr = scraper.Scraper()
 
-    pagename = wikipedia.search(plant)[0]
-    try:
-        summary = wikipedia.summary(pagename)
-    except wikipedia.exceptions.DisambiguationError as e:
-        summary = wikipedia.summary(e.options[0])
-    lines = re.split(r"(?<!syn)\.", summary)
-    firstline = lines[0] + "." + "\n"
-    f.write(firstline)
+print(plants)
+
+for plant in plants[0:2]:
+
+    f.write("# " + plant.title() + "\n")
+    text = scr.scrape(plant)
+    lines = re.split(r"(?<!syn)\.", text, maxsplit=1)
+    f.write("##" + lines[0] + ".\n")
+
+    poem = synsound.poetify(lines[1])
+    f.write(poem)
 
     f.write("<div style=\"page-break-after: always;\"></div>\n")
 
 f.close()
+scr.close()
 
 # print(plants)
 
