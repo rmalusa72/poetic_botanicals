@@ -25,12 +25,14 @@ for plant in plants[0:2]:
     f.write("# " + plant.title() + "\n")
     text = scr.scrape(plant)
     lines = re.split(r"(?<!syn)\.", text, maxsplit=1)
-    f.write("##" + lines[0] + ".\n")
+    f.write("## " + lines[0] + ". ##\n")
 
     poem = synsound.poetify(lines[1])
+    f.write("```\n")
     f.write(poem)
+    f.write("```\n")
 
-    f.write("<div style=\"page-break-after: always;\"></div>\n")
+    f.write("<!-- \newpage -->")
 
 f.close()
 scr.close()
