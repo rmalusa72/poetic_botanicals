@@ -1,4 +1,5 @@
-thesaurus
-pronouncing
-numpy
-num2words
+num2words>=0.5.7
+numpy>=1.14.3
+pronouncing>=0.2.0
+thesaurus>=0.2.2
+wikipedia>=1.4.0
