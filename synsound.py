@@ -10,6 +10,7 @@ from num2words import num2words
 
 STRESSED = True
 UNSTRESSED = False
+
 PHONETIC_SIMILARITY_WEIGHT = 9
 METRIC_CONFORMITY_WEIGHT = 1
 LINE_LENGTH_SYLLABLES = 10
@@ -95,7 +96,8 @@ def score_phonetic_similarity(word1, word2):
     return ((psvs.get_phonetic_similarity(word1,word2) + 1 )/ 2)
 
 # todo: change how meter works to go by whether last syllable is stressed or unstressed rather than num syllables?
-def poetify(sentence):
+def poetify(sentence, parameters=(PHONETIC_SIMILARITY_WEIGHT, METRIC_CONFORMITY_WEIGHT, 
+    LINE_LENGTH_SYLLABLES, POEM_LENGTH, SCORE_THRESHOLD, SWITCH_ODDS)):
 
     poem = []
     next_syllable = UNSTRESSED
