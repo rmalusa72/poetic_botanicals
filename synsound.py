@@ -5,6 +5,7 @@ import re
 import thesaurus
 import pronouncing 
 import psv
+import random
 from num2words import num2words
 
 STRESSED = True
@@ -12,6 +13,9 @@ UNSTRESSED = False
 PHONETIC_SIMILARITY_WEIGHT = 9
 METRIC_CONFORMITY_WEIGHT = 1
 LINE_LENGTH_SYLLABLES = 10
+POEM_LENGTH = 100
+SCORE_THRESHOLD = 6
+SWITCH_ODDS = 1
 
 psvs = psv.PSV_Space()
 
@@ -98,6 +102,110 @@ def poetify(sentence):
     pre_words = re.findall(r"([\d]+[,\d]+|\w+\'?\w*)", sentence)
     words = []
 
+    for word in pre_words:
+
+        # Check if each word is a number
+        if not re.search(r"\d", word):
+            words.append(word)
+        else:
+            # If word contains digits, split into digit and non-digit pieces
+            word = re.sub(",", "", word)
+            split_by_numbers = re.split(r"(\d+)", word)
+            for piece in split_by_numbers:
+                #print(piece)
+                # Convert digits to strings and add non-digit strings
+                if re.fullmatch(r"\d+", piece):
+                    word_version = num2words(int(piece), lang="en")
+                    words = words + re.findall(r"\w+", word_version)
+                elif piece != "": 
+                    words.append(piece)
+
+    print(words)
+
+    index = 0 
+    num_words = len(words)
+
+    for i in range(0, POEM_LENGTH):
+
+        #print(index)
+        word = words[index]
+
+        # Potential next words are stored in a dictionary with the format
+        # word: score
+        potential_words = {word:0}
+
+        # Get word's synonyms to add to potential words
+        w = thesaurus.Word(word)
+        synonyms = w.synonyms()
+        for synonym in synonyms:
+            potential_words[synonym] =  0
+
+        # Score potential words
+        maxscore = 0
+        maxscoreword = word
+
+        for nextword in potential_words.keys():
+            if len(poem) > 0: 
+                phonetic_similarity = score_phonetic_similarity(poem[-1], nextword)
+
+                if next_syllable == UNSTRESSED: 
+                    meter = "01"
+                else:
+                    meter = "10"
+                metric_conformity = score_metric_conformity(meter, nextword)
+
+                score = phonetic_similarity * PHONETIC_SIMILARITY_WEIGHT + metric_conformity * METRIC_CONFORMITY_WEIGHT
+                potential_words[nextword] = score
+
+                if score > maxscore:
+                    maxscore = score
+                    maxscoreword = nextword
+
+        
+        if maxscore < SCORE_THRESHOLD:
+            dice = random.randint(0,9)
+            if dice < SWITCH_ODDS:
+                i = i - 1
+                index = random.randint(0, num_words-1)
+                #print("switching")
+                continue
+
+        index = index + 1
+        if index >= num_words:
+            index = random.randint(0, num_words-1)
+
+        #print(maxscoreword + str(maxscore))
+        poem.append(maxscoreword)
+        stresses = get_stresses(maxscoreword)
+        if len(stresses) % 2 == 1:
+            next_syllable = not next_syllable
+
+    return poem_to_string(poem)
+
+def poem_to_string(poem):
+    output = ""
+    running_syllable_count = 0
+    for item in poem:
+        words = item.split(" ")
+        for word in words:
+            stresses = get_stresses(word)
+            syllable_count = len(stresses)
+            output = output + word + " "
+            running_syllable_count += syllable_count
+            if running_syllable_count >= LINE_LENGTH_SYLLABLES:
+                running_syllable_count = 0
+                output = output + "\n"
+    output = output + "\n"
+    return output
+
+# todo: change how meter works to go by whether last syllable is stressed or unstressed rather than num syllables?
+def poetify_old_2(sentence):
+
+    poem = []
+    next_syllable = UNSTRESSED
+    pre_words = re.findall(r"([\d]+[,\d]+|\w+\'?\w*)", sentence)
+    words = []
+
     print(pre_words)
 
     for word in pre_words:
@@ -163,22 +271,6 @@ def poetify(sentence):
             next_syllable = not next_syllable
 
     return poem_to_string(poem)
-
-def poem_to_string(poem):
-    output = ""
-    running_syllable_count = 0
-    for item in poem:
-        words = item.split(" ")
-        for word in words:
-            stresses = get_stresses(word)
-            syllable_count = len(stresses)
-            output = output + word + " "
-            running_syllable_count += syllable_count
-            if running_syllable_count >= LINE_LENGTH_SYLLABLES:
-                running_syllable_count = 0
-                output = output + "\n"
-    output = output + "\n"
-    return output
 
 # Attempt synonym replacement to construct metered (currently iambic) text
 def poetify_old(sentence):

@@ -19,20 +19,27 @@ f = open(filename, "w")
 scr = scraper.Scraper()
 
 print(plants)
+print(len(plants))
 
-for plant in plants[0:2]:
+for plant in plants:
 
     f.write("# " + plant.title() + "\n")
     text = scr.scrape(plant)
     lines = re.split(r"(?<!syn)\.", text, maxsplit=1)
     f.write("## " + lines[0] + ". ##\n")
 
-    poem = synsound.poetify(lines[1])
+    if len(lines) > 1:
+        source = lines[1]
+    else:
+        source = lines[0]
+
+    poem = synsound.poetify(source)
+
     f.write("```\n")
     f.write(poem)
     f.write("```\n")
 
-    f.write("<!-- \newpage -->")
+    f.write("<!-- \\newpage -->\n")
 
 f.close()
 scr.close()
