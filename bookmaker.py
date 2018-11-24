@@ -51,9 +51,7 @@ for plant in plants[0:5]:
     f.write("```\n")
     f.write(poem)
     f.write("```\n")
-
-    f.write("<!-- \\newpage -->\n")
-
+    
 f.close()
 scr.close()
 
