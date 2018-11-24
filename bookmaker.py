@@ -32,7 +32,7 @@ scr = scraper.Scraper()
 print(plants)
 print(len(plants))
 
-for plant in plants[0:5]:
+for plant in plants:
 
     f.write("# " + plant.title() + "\n")
     text = scr.scrape(plant)
@@ -51,7 +51,7 @@ for plant in plants[0:5]:
     f.write("```\n")
     f.write(poem)
     f.write("```\n")
-    
+
 f.close()
 scr.close()
 
