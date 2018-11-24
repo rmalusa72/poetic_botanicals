@@ -16,7 +16,7 @@ class PSV_Space():
 
     def __init__(self):
         self.space = dict()
-        for line in open("cmudict-0.7b-simvecs", encoding="latin1"):
+        for line in open("resources/cmudict-0.7b-simvecs", encoding="latin1"):
             line = line.strip()
             word, vec_raw = line.split("  ")
             word = word.lower()
