@@ -30,7 +30,8 @@ class Scraper:
                     index = index + 1
                     if len(e.options) > index:
                         pagename = e.options[index]
-
+                    else:
+                        return False
 
         # try:
         #     summary = wikipedia.summary(pagename)
