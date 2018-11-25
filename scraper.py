@@ -2,6 +2,7 @@
 # Grabs text from wikipedia
 
 import wikipedia
+import re
 
 class Scraper:
 
@@ -25,6 +26,7 @@ class Scraper:
                 print("options: " + str(e.options))
                 last_pagename = pagename
                 pagename = e.options[0]
+                pagename = re.sub(" ", "_", pagename)
                 if pagename == last_pagename:
                     # Stuck in disambiguation loop
                     index = index + 1
