@@ -122,7 +122,7 @@ def poetify(sentence, parameters=(PHONETIC_SIMILARITY_WEIGHT, METRIC_CONFORMITY_
                 elif piece != "": 
                     words.append(piece)
 
-    print(words)
+    #print(words)
 
     index = 0 
     num_words = len(words)

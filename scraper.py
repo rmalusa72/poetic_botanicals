@@ -20,17 +20,17 @@ class Scraper:
         index = 0
 
         while not success:
-            print(pagename)
+            # print(pagename)
             try:
                 summary = wikipedia.summary(pagename, auto_suggest=auto_suggest_on)
                 success = True
-                print("success with " + pagename)
+                # print("success with " + pagename)
             except wikipedia.exceptions.DisambiguationError as e:
-                print("Excepting DisambiguationError for " + pagename)
-                print("options: " + str(e.options))
+                # print("Excepting DisambiguationError for " + pagename)
+                # print("options: " + str(e.options))
                 last_pagename = pagename
                 pagename = e.options[0]
-                print("New pagename is " + pagename)
+                # print("New pagename is " + pagename)
                 auto_suggest_on = False
                 if pagename == last_pagename:
                     # Stuck in disambiguation loop

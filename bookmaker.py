@@ -19,9 +19,9 @@ def random_poem_parameters():
 
 plants = []
 for flower in pycorpora.plants.flowers['flowers']:
-    plants.append(flower)
+    plants.append(flower.lower())
 for plant in pycorpora.plants.plants['instruments']:
-    plants.append(plant["name"])
+    plants.append(plant["name"].lower())
 plants.sort()
 
 filename = "book/output.txt"
@@ -29,10 +29,15 @@ f = open(filename, "w")
 
 scr = scraper.Scraper()
 
-print(plants)
-print(len(plants))
+#print(plants)
+#print(len(plants))
+total_entries = len(plants)
+current_entry = 0
 
 for plant in plants:
+
+    print(str(current_entry) + " / " + str(total_entries))
+    current_entry += 1
 
     f.write("# " + plant.title() + "\n")
     text = scr.scrape(plant)
