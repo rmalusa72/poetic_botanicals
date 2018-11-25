@@ -15,18 +15,23 @@ class Scraper:
         pagename = wikipedia.search(query)[0]
         
         success = False
+        auto_suggest_on = True # Only want to use auto suggest if we're not coming from a disambiguation page
         last_pagename = pagename
         index = 0
+
         while not success:
+            print(pagename)
             try:
-                summary = wikipedia.summary(pagename)
+                summary = wikipedia.summary(pagename, auto_suggest=auto_suggest_on)
                 success = True
+                print("success with " + pagename)
             except wikipedia.exceptions.DisambiguationError as e:
                 print("Excepting DisambiguationError for " + pagename)
                 print("options: " + str(e.options))
                 last_pagename = pagename
                 pagename = e.options[0]
-                pagename = re.sub(" ", "_", pagename)
+                print("New pagename is " + pagename)
+                auto_suggest_on = False
                 if pagename == last_pagename:
                     # Stuck in disambiguation loop
                     index = index + 1
@@ -44,7 +49,7 @@ class Scraper:
         #     summary = wikipedia.summary(pagename)
 
 
-        page = wikipedia.page(title=pagename)
+        page = wikipedia.page(title=pagename, auto_suggest=auto_suggest_on)
         self.bib.write(pagename + "\n")
         return page.content
 
