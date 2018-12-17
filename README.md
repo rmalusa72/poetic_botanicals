@@ -1,4 +1,6 @@
 # poetic_botanicals
+**BUGGED: thesaurus seems to be currently broken and only produces empty lists of synonyms**
+
 Generative field guide with poetry for NaNoGenMo 2018
 
 Running bookmaker.py generates a set of poems in book/output.txt, one for each poem in the list of plants scraped from pycorpora, with a list of wikipedia pages referenced in book/pages_used.txt. Right now this output can be formatted by multimarkdown into HTML, but not into functional LaTeX. 
