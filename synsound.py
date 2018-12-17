@@ -135,10 +135,15 @@ def poetify(sentence, parameters=(PHONETIC_SIMILARITY_WEIGHT, METRIC_CONFORMITY_
         # Potential next words are stored in a dictionary with the format
         # word: score
         potential_words = {word:0}
+        synonyms = []
 
         # Get word's synonyms to add to potential words
-        w = thesaurus.Word(word)
-        synonyms = w.synonyms()
+        try:
+            w = thesaurus.Word(word)
+            synonyms = w.synonyms()
+        except:
+            synonyms = []
+
         for synonym in synonyms:
             potential_words[synonym] =  0
 
