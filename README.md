@@ -1,5 +1,6 @@
 # poetic_botanicals
 ~~BUGGED: thesaurus seems to be currently broken and only produces empty lists of synonyms~~ Fixed! 
+BUGGED: Thesaurus.py is no more ):
 
 Generative field guide with poetry for NaNoGenMo 2018
 
